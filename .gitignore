@@ -1,0 +1,210 @@
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.staging
+environment.env
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# Airflow
+airflow.cfg
+airflow.db
+logs/
+dags/__pycache__/
+plugins/__pycache__/
+unittests.cfg
+webserver_config.py
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+.docker/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+log/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+.temp/
+
+# Secrets and credentials
+secrets/
+credentials/
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Data files (uncomment if you don't want to track data)
+# data/
+# *.csv
+# *.json
+# *.parquet
+# *.avro
+
+# Spark
+spark-warehouse/
+metastore_db/
+derby.log
+
+# Kafka
+kafka-logs/
+
+# Redis
+dump.rdb
+
+# PostgreSQL
+postgres_data/
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Compressed files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Node.js (if using any frontend tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# MacOS
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
