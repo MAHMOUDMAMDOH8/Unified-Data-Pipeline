@@ -1,0 +1,11 @@
+apache-airflow==2.9.1
+pandas
+psycopg2
+psycopg2_binary
+python-dotenv
+requests
+openpyxl
+pipx
+sqlalchemy  
+dbt-core
+dbt-redshift
