@@ -1,0 +1,96 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Online Store Order Log",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "timestamp",
+    "level",
+    "service",
+    "event_type",
+    "user_id",
+    "session_id",
+    "session_duration",
+    "device_type",
+    "geo_location",
+    "details"
+  ],
+  "properties": {
+    "timestamp": { "type": "string", "format": "date-time" },
+    "level": { "type": "string", "enum": ["INFO"] },
+    "service": { "type": "string", "const": "online-store" },
+    "event_type": { "type": "string", "const": "order" },
+    "user_id": { "type": "string" },
+    "session_id": { "type": "string" },
+    "session_duration": { "type": "integer", "minimum": 1 },
+    "device_type": { "type": "string", "enum": ["desktop", "mobile", "tablet"] },
+    "geo_location": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["country", "city"],
+      "properties": {
+        "country": { "type": "string" },
+        "city": { "type": "string" }
+      }
+    },
+    "details": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "order_id",
+        "status",
+        "items",
+        "order_amount",
+        "currency",
+        "shipping_method",
+        "shipping_address",
+        "warehouse",
+        "carrier",
+        "tracking_number",
+        "completed_at",
+        "delivery_estimate"
+      ],
+      "properties": {
+        "order_id": { "type": "string" },
+        "status": { "type": "string", "const": "completed" },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["product_id", "quantity", "unit_price", "line_amount", "category"],
+            "properties": {
+              "product_id": { "type": "integer", "minimum": 1, "maximum": 77 },
+              "quantity": { "type": "integer", "minimum": 1 },
+              "unit_price": { "type": "number", "exclusiveMinimum": 0 },
+              "line_amount": { "type": "number", "exclusiveMinimum": 0 },
+              "category": {
+                "type": "string",
+                "enum": [
+                  "Beverages",
+                  "Condiments",
+                  "Confections",
+                  "Dairy Products",
+                  "Grains/Cereals",
+                  "Meat/Poultry",
+                  "Produce",
+                  "Seafood"
+                ]
+              }
+            }
+          }
+        },
+        "order_amount": { "type": "number", "exclusiveMinimum": 0 },
+        "currency": { "type": "string", "const": "USD" },
+        "shipping_method": { "type": "string", "enum": ["standard", "express", "pickup"] },
+        "shipping_address": { "type": "string" },
+        "warehouse": { "type": "string", "enum": ["WH-Cairo", "WH-Riyadh", "WH-Dubai", "WH-Kuwait"] },
+        "carrier": { "type": "string", "enum": ["DHL", "Aramex", "FedEx"] },
+        "tracking_number": { "type": "string" },
+        "completed_at": { "type": "string", "format": "date-time" },
+        "delivery_estimate": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}
