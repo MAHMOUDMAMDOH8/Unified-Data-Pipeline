@@ -1,6 +1,10 @@
 import logging
+import os
 import boto3
+from botocore.config import Config
 from botocore.exceptions import ClientError, NoCredentialsError
+from urllib3.exceptions import InsecureRequestWarning
+import urllib3
 import pandas as pd
 from io import BytesIO
 
@@ -12,7 +16,48 @@ logging.basicConfig(
 
 def get_s3_client():
     try:
-        return boto3.client('s3')
+        # Read configuration from environment variables to support S3-compatible services
+        # Endpoint precedence: S3_ENDPOINT_URL > AWS_S3_ENDPOINT > MINIO_ENDPOINT_URL > ENDPOINT
+        endpoint_url = (
+            os.getenv('S3_ENDPOINT_URL')
+            or os.getenv('AWS_S3_ENDPOINT')
+            or os.getenv('MINIO_ENDPOINT_URL')
+            or os.getenv('ENDPOINT')
+        )
+
+        # SSL verification control (default true). Accept common truthy/falsey strings
+        verify_env_value = os.getenv('S3_VERIFY_SSL', 'true').strip().lower()
+        verify = verify_env_value in ('1', 'true', 't', 'yes', 'y')
+
+        # Optionally suppress urllib3 insecure request warnings when verify is False
+        suppress_warn_env = os.getenv('S3_SUPPRESS_INSECURE_WARNING', 'true').strip().lower()
+        suppress_insecure_warning = suppress_warn_env in ('1', 'true', 't', 'yes', 'y')
+        if not verify and suppress_insecure_warning:
+            urllib3.disable_warnings(InsecureRequestWarning)
+
+        # Addressing style: 'path' is preferred for many S3-compatible services
+        addressing_style = os.getenv('S3_ADDRESSING_STYLE', 'path').strip().lower()
+        if addressing_style not in ('auto', 'path', 'virtual'):
+            addressing_style = 'path'
+
+        s3_config = Config(s3={'addressing_style': addressing_style})
+
+        # Credentials/region (fallback to env used by AWS SDK)
+        aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
+        aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+        aws_session_token = os.getenv('AWS_SESSION_TOKEN')
+        region_name = os.getenv('AWS_DEFAULT_REGION', 'us-east-1')
+
+        return boto3.client(
+            's3',
+            endpoint_url=endpoint_url,
+            verify=verify,
+            config=s3_config,
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key,
+            aws_session_token=aws_session_token,
+            region_name=region_name,
+        )
     except NoCredentialsError:
         logging.error("AWS credentials not found")
         return None
