@@ -86,6 +86,8 @@ services:
   x-airflow-common:
     &airflow-common
     build: .
+    env_file:
+      - s3-credentials.env
     environment:
       &airflow-common-env
       AIRFLOW__CORE__EXECUTOR: CeleryExecutor
@@ -101,6 +103,10 @@ services:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-your_access_key_here}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-your_secret_key_here}
       AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-us-east-1}
+      # S3 Configuration for LocalStack/MinIO
+      S3_ENDPOINT_URL: ${S3_ENDPOINT_URL:-https://legendary-waddle-wpxjw6pjxp7f9pvp-4566.app.github.dev}
+      S3_VERIFY_SSL: ${S3_VERIFY_SSL:-false}
+      S3_ADDRESSING_STYLE: ${S3_ADDRESSING_STYLE:-path}
     volumes:
       - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
       - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
