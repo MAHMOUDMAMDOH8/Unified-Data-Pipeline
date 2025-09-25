@@ -30,7 +30,7 @@ def load_credentials():
         "user": 'airflow',
         "password": 'airflow'
     }
-bucket = 'storepipeline'
+bucket = 'incircl'
 tables = ['products','categories','customers','employees','orders','order_details']
 
 def test_connection():
