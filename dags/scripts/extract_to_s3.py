@@ -14,7 +14,7 @@ def landing_layer_extract(conn,engine,bucket,table_name):
                 return False
             
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            s3_key = f"Landing-layer/batch-job/Store-db/{table_name}/{timestamp}.parquet"
+            s3_key = f"bronze_layer/batch_job/{table_name}/{timestamp}.parquet"
             success = upload_parquet(df, bucket, s3_key)
             if success:
                 logging.info(f"Data from {table_name} table uploaded to S3 successfully")
