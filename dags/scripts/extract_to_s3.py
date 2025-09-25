@@ -1,0 +1,31 @@
+from scripts.Utils.db_utils import Get_data
+from scripts.Utils.s3_utils import upload_parquet
+import pandas as pd
+import logging
+from datetime import datetime
+
+
+def landing_layer_extract(conn,engine,bucket,table_name):
+    try:
+        if conn:
+            df = Get_data(conn,engine,table_name)
+            if df is None:
+                logging.info(f"No data extracted from {table_name} table")
+                return False
+            
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            s3_key = f"Landing-layer/batch-job/Store-db/{table_name}/{timestamp}.parquet"
+            success = upload_parquet(df, bucket, s3_key)
+            if success:
+                logging.info(f"Data from {table_name} table uploaded to S3 successfully")
+                return True
+            else:
+                logging.info(f"Failed to upload data from {table_name} table to S3")
+                return False
+        else:
+            logging.info("No valid database connection")
+            return False
+    except Exception as e:
+        logging.error(f"Error in landing_layer_extract for {table_name}: {str(e)}")
+        return False
+        
