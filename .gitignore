@@ -128,6 +128,8 @@ docker-compose.override.yml
 logs/
 log/
 
+*.sh
+
 # OS generated files
 .DS_Store
 .DS_Store?

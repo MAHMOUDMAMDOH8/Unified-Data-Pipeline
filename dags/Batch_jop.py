@@ -3,6 +3,7 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.utils.dates import days_ago
 from scripts.extract_to_s3 import landing_layer_extract
 from scripts.Utils.db_utils import create_connection, close_connection
+from scripts.GP_validate import run_validation
 
 import logging
 
@@ -25,7 +26,7 @@ dag = DAG(
 
 def load_credentials():
     return {
-        "host": "172.19.0.3",
+        "host": "172.19.0.4",
         "db_name": 'store_db',
         "user": 'airflow',
         "password": 'airflow'
@@ -72,6 +73,17 @@ def from_db_to_s3():
             close_connection(conn, engine)
 
 
+def gp_validation():
+    try:
+        logging.info("Starting GP validation process")
+        run_validation()
+        logging.info("GP validation completed successfully")
+        return True
+    except Exception as e:
+        logging.error(f"Error in GP validation: {str(e)}")
+        return False
+
+
 database_preparation_task = PythonOperator(
     task_id='database_preparation',
     python_callable=test_connection,
@@ -84,4 +96,10 @@ data_delivery_task = PythonOperator(
     dag=dag,
 )
 
-database_preparation_task >> data_delivery_task
+gp_validation_task = PythonOperator(
+    task_id='gp_validation',
+    python_callable=gp_validation,
+    dag=dag,
+)
+
+database_preparation_task >> data_delivery_task >> gp_validation_task
