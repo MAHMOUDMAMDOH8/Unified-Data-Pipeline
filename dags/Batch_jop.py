@@ -5,6 +5,7 @@ from scripts.extract_to_s3 import landing_layer_extract
 from scripts.Utils.db_utils import create_connection, close_connection
 from scripts.GP_validate import run_validation
 
+
 import logging
 
 default_args = {
@@ -26,7 +27,7 @@ dag = DAG(
 
 def load_credentials():
     return {
-        "host": "172.19.0.4",
+        "host": "172.19.0.3",
         "db_name": 'store_db',
         "user": 'airflow',
         "password": 'airflow'
@@ -102,4 +103,5 @@ gp_validation_task = PythonOperator(
     dag=dag,
 )
 
-database_preparation_task >> data_delivery_task >> gp_validation_task
+
+database_preparation_task >> data_delivery_task >> gp_validation_task  

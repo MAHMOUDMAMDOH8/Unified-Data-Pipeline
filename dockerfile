@@ -11,10 +11,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 USER airflow
 
-COPY requirements.txt .
+# Copy requirements and install additional packages (excluding apache-airflow since it's already in base image)
+COPY requirements-airflow.txt .
 
 RUN python3 -m pip install --upgrade pip && \
-    pip install -r requirements.txt
+    pip install -r requirements-airflow.txt
 
 COPY dags /opt/airflow/dags
 COPY scripts /opt/airflow/scripts

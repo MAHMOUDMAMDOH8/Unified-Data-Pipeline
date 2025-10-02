@@ -1,4 +1,6 @@
--- Active: 1718352668152@@172.19.0.3@5432@store_db@public
+-- Connect to store_db and create tables
+\c store_db;
+
 -- Drop existing tables if they exist
 DROP TABLE IF EXISTS "Brand";
 DROP TABLE IF EXISTS "Categorys";
@@ -23,30 +25,15 @@ CREATE TABLE categories (
     picture bytea
 );
 
-
---
--- Name: customer_customer_demo; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
 CREATE TABLE customer_customer_demo (
     customer_id character varying(5) NOT NULL,
     customer_type_id character varying(5) NOT NULL
 );
 
-
---
--- Name: customer_demographics; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
 CREATE TABLE customer_demographics (
     customer_type_id character varying(5) NOT NULL,
     customer_desc text
 );
-
-
---
--- Name: customers; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
 
 CREATE TABLE customers (
     customer_id character varying(5) NOT NULL,
@@ -61,11 +48,6 @@ CREATE TABLE customers (
     phone character varying(24),
     fax character varying(24)
 );
-
-
---
--- Name: employees; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
 
 CREATE TABLE employees (
     employee_id smallint NOT NULL,
@@ -88,22 +70,10 @@ CREATE TABLE employees (
     photo_path character varying(255)
 );
 
-
---
--- Name: employee_territories; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
 CREATE TABLE employee_territories (
     employee_id smallint NOT NULL,
     territory_id character varying(20) NOT NULL
 );
-
-
-
-
---
--- Name: order_details; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
 
 CREATE TABLE order_details (
     order_id smallint NOT NULL,
@@ -112,11 +82,6 @@ CREATE TABLE order_details (
     quantity smallint NOT NULL,
     discount real NOT NULL
 );
-
-
---
--- Name: orders; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
 
 CREATE TABLE orders (
     order_id smallint NOT NULL,
@@ -135,11 +100,6 @@ CREATE TABLE orders (
     ship_country character varying(15)
 );
 
-
---
--- Name: products; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
 CREATE TABLE products (
     product_id smallint NOT NULL,
     product_name character varying(40) NOT NULL,
@@ -153,32 +113,16 @@ CREATE TABLE products (
     discontinued integer NOT NULL
 );
 
-
---
--- Name: region; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
 CREATE TABLE region (
     region_id smallint NOT NULL,
-    region_description character varying(60) NOT NULL
+    region_description character varying(50) NOT NULL
 );
-
-
---
--- Name: shippers; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
 
 CREATE TABLE shippers (
     shipper_id smallint NOT NULL,
     company_name character varying(40) NOT NULL,
     phone character varying(24)
 );
-
-
-
---
--- Name: suppliers; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
 
 CREATE TABLE suppliers (
     supplier_id smallint NOT NULL,
@@ -195,21 +139,11 @@ CREATE TABLE suppliers (
     homepage text
 );
 
-
---
--- Name: territories; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
 CREATE TABLE territories (
     territory_id character varying(20) NOT NULL,
-    territory_description character varying(60) NOT NULL,
+    territory_description character varying(50) NOT NULL,
     region_id smallint NOT NULL
 );
-
-
---
--- Name: us_states; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
 
 CREATE TABLE us_states (
     state_id smallint NOT NULL,
@@ -218,4 +152,22 @@ CREATE TABLE us_states (
     state_region character varying(50)
 );
 
+-- Add primary keys and constraints
+ALTER TABLE ONLY categories ADD CONSTRAINT pk_categories PRIMARY KEY (category_id);
+ALTER TABLE ONLY customer_customer_demo ADD CONSTRAINT pk_customer_customer_demo PRIMARY KEY (customer_id, customer_type_id);
+ALTER TABLE ONLY customer_demographics ADD CONSTRAINT pk_customer_demographics PRIMARY KEY (customer_type_id);
+ALTER TABLE ONLY customers ADD CONSTRAINT pk_customers PRIMARY KEY (customer_id);
+ALTER TABLE ONLY employees ADD CONSTRAINT pk_employees PRIMARY KEY (employee_id);
+ALTER TABLE ONLY employee_territories ADD CONSTRAINT pk_employee_territories PRIMARY KEY (employee_id, territory_id);
+ALTER TABLE ONLY order_details ADD CONSTRAINT pk_order_details PRIMARY KEY (order_id, product_id);
+ALTER TABLE ONLY orders ADD CONSTRAINT pk_orders PRIMARY KEY (order_id);
+ALTER TABLE ONLY products ADD CONSTRAINT pk_products PRIMARY KEY (product_id);
+ALTER TABLE ONLY region ADD CONSTRAINT pk_region PRIMARY KEY (region_id);
+ALTER TABLE ONLY shippers ADD CONSTRAINT pk_shippers PRIMARY KEY (shipper_id);
+ALTER TABLE ONLY suppliers ADD CONSTRAINT pk_suppliers PRIMARY KEY (supplier_id);
+ALTER TABLE ONLY territories ADD CONSTRAINT pk_territories PRIMARY KEY (territory_id);
+ALTER TABLE ONLY us_states ADD CONSTRAINT pk_us_states PRIMARY KEY (state_id);
 
+-- Grant permissions
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO airflow;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO airflow;

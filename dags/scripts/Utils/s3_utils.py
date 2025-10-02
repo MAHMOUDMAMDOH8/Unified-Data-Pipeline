@@ -6,7 +6,7 @@ from botocore.exceptions import ClientError, NoCredentialsError
 from urllib3.exceptions import InsecureRequestWarning
 import urllib3
 import pandas as pd
-from io import BytesIO
+from io import BytesIO, StringIO
 
 logging.basicConfig(
     level=logging.INFO,
@@ -91,7 +91,7 @@ def upload_parquet(data, bucket, key):
             data.to_parquet(buffer, index=False)
             body = buffer.getvalue()
         elif isinstance(data, str):
-            df = pd.read_csv(pd.StringIO(data))
+            df = pd.read_csv(StringIO(data))
             buffer = BytesIO()
             df.to_parquet(buffer, index=False)
             body = buffer.getvalue()

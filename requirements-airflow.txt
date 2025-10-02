@@ -1,4 +1,3 @@
-apache-airflow==2.9.1
 pandas
 psycopg2
 psycopg2_binary
@@ -8,4 +7,6 @@ openpyxl
 pipx
 sqlalchemy  
 dbt-core
-dbt-redshift
+dbt-clickhouse
+pyspark
+kafka-python
