@@ -18,10 +18,15 @@ def run_streamlit_dashboard():
         os.environ['S3_ADDRESSING_STYLE'] = 'path'
         os.environ['DATA_LAKE_BUCKET'] = 'incircl'
         
+        # Set environment variables for service monitoring
+        os.environ['KAFKA_BOOTSTRAP_SERVERS'] = 'kafka:9092'
+        os.environ['AIRFLOW_HOST'] = 'localhost'
+        os.environ['AIRFLOW_PORT'] = '8080'
+        
         # Run Streamlit
         cmd = [
             sys.executable, '-m', 'streamlit', 'run',
-            'Stream_lite_batch.py',
+            'Stream_lite_dashboard.py',
             '--server.port=8501',
             '--server.address=0.0.0.0',
             '--server.headless=true'

@@ -12,14 +12,14 @@ DAGS_ROOT = os.path.abspath(os.path.join(CURRENT_DIR, '..', '..'))
 if DAGS_ROOT not in sys.path:
     sys.path.append(DAGS_ROOT)
 
-from scripts.Stream.Logs.logs import LogGenerator
+from Logs.logs import LogGenerator
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('producer')
 
 topic = os.getenv('KAFKA_TOPIC', 'Stock')
 
-bootstrap_servers = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'localhost:9092')
+bootstrap_servers = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'kafka:9092')
 producer = KafkaProducer(
     bootstrap_servers=[bootstrap_servers],
     value_serializer=lambda v: json.dumps(v).encode("utf-8"),
@@ -32,19 +32,26 @@ def Stream_events(num_event=100):
     """
     Stream events to Kafka topic
     """
+    logger.info(f"Starting to produce {num_event} events to topic: {topic}")
     counter = 0
     while counter < num_event:
         try:
             events = LogGenerator().generate_logs(1, interval=0)
             event = events[0]
             event_type = event['event_type']
-            producer.send(topic, value=event)
-            logger.info(f"Produced event: {event_type}")
+            
+            # Send to Kafka
+            future = producer.send(topic, value=event)
+            result = future.get(timeout=10)  # Wait for confirmation
+            
+            logger.info(f"Produced event {counter + 1}/{num_event}: {event_type} - Partition: {result.partition}, Offset: {result.offset}")
             counter += 1
             time.sleep(random.uniform(0.1, 0.5))
         except Exception as e:
-            logger.error(f"Error producing event: {e}")
+            logger.error(f"Error producing event {counter + 1}: {e}")
             time.sleep(1)
+    
+    logger.info(f"Finished producing {counter} events")
 
 
 if __name__ == "__main__":

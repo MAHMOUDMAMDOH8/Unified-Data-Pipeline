@@ -2,6 +2,7 @@ from airflow import DAG
 from airflow.utils.dates import days_ago
 from airflow.operators.bash import BashOperator
 import os
+from airflow.operators.python import PythonOperator
 
 
 default_args = {
@@ -25,6 +26,7 @@ dag = DAG(
 
 PRODUCER_PATH = "/opt/airflow/dags/scripts/Stream/Producer.py"
 CONSUMER_PATH = "/opt/airflow/dags/scripts/Stream/Consumer.py"
+VALIDATION_PATH = "/opt/airflow/dags/scripts/Stream/stream_validations.py"
 
 
 task_env = {
@@ -58,4 +60,11 @@ consume_to_s3 = BashOperator(
 )
 
 
-produce_logs >> consume_to_s3
+validate_data = BashOperator(
+    task_id='validate_data',
+    bash_command=f"python {VALIDATION_PATH}",
+    env=task_env,
+    dag=dag,
+)
+
+produce_logs >> consume_to_s3 >> validate_data

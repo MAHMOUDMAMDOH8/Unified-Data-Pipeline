@@ -9,13 +9,9 @@ services:
     image: bitnami/spark:latest
     container_name: spark
     volumes:
-      - ./includes:/opt/spark/includes
-      - ./jinja_templates:/jinja_templates
       - ./environment.env:/environment.env
-      - ./tests:/tests
-      - ./Source:/opt/spark/source
       - ./spark/core-site.xml:/opt/spark/conf/core-site.xml
-      - ./spark-apps:/opt/spark-apps
+      - ./dags:/opt/airflow/dags
     ports:
       - 7077:7077
       - 8888:8888
@@ -107,6 +103,8 @@ services:
       S3_ENDPOINT_URL: ${S3_ENDPOINT_URL:-https://legendary-waddle-wpxjw6pjxp7f9pvp-4566.app.github.dev}
       S3_VERIFY_SSL: ${S3_VERIFY_SSL:-false}
       S3_ADDRESSING_STYLE: ${S3_ADDRESSING_STYLE:-path}
+      # Java Configuration for Spark
+      JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
     volumes:
       - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
       - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs

@@ -1,6 +1,7 @@
 import logging
 import os
 import boto3
+import json
 from botocore.config import Config
 from botocore.exceptions import ClientError, NoCredentialsError
 from urllib3.exceptions import InsecureRequestWarning
@@ -160,11 +161,90 @@ def read_parquet_from_s3(bucket: str, key: str) -> pd.DataFrame | None:
         return None
 
 
-def get_latest_table_dataframe(bucket: str, table_name: str) -> tuple[pd.DataFrame | None, str | None]:
+def read_json_from_s3(bucket: str, key: str) -> pd.DataFrame | None:
+    try:
+        s3_client = get_s3_client()
+        if not s3_client:
+            return None
+        obj = s3_client.get_object(Bucket=bucket, Key=key)
+        body = obj['Body'].read()
+        
+        # Handle JSONL format (one JSON object per line) from Spark streaming
+        try:
+            # First try to read as JSONL
+            text = body.decode('utf-8')
+            lines = text.strip().split('\n')
+            if lines and lines[0]:  # Check if file is not empty
+                # Parse each line as a separate JSON object
+                json_objects = []
+                for line in lines:
+                    line = line.strip()
+                    if line:  # Skip empty lines
+                        try:
+                            json_obj = json.loads(line)
+                            json_objects.append(json_obj)
+                        except json.JSONDecodeError as e:
+                            logging.warning(f"Skipping invalid JSON line: {e}")
+                            continue
+                
+                if json_objects:
+                    df = pd.DataFrame(json_objects)
+                    return df
+                else:
+                    logging.warning(f"No valid JSON objects found in {key}")
+                    return pd.DataFrame()
+            else:
+                logging.warning(f"Empty file: {key}")
+                return pd.DataFrame()
+                
+        except UnicodeDecodeError:
+            logging.error(f"Could not decode file as UTF-8: {key}")
+            return None
+            
+    except Exception as e:
+        logging.error(f"Error reading json from s3://{bucket}/{key}: {e}")
+        return None
 
-    latest_key = get_latest_parquet_key(bucket=bucket, table_name=table_name)
+
+def get_latest_table_dataframe(file_type ,bucket: str, table_name: str) -> tuple[pd.DataFrame | None, str | None]:
+
+    if file_type == 'parquet':
+        latest_key = get_latest_parquet_key(bucket=bucket, table_name=table_name)
+    else:
+        latest_key = get_latest_json_key(bucket=bucket, table_name=table_name)
     if not latest_key:
         logging.info(f"No parquet found for table {table_name}")
         return None, None
-    df = read_parquet_from_s3(bucket=bucket, key=latest_key)
+    if file_type == 'parquet':
+        df = read_parquet_from_s3(bucket=bucket, key=latest_key)
+    else:
+        df = read_json_from_s3(bucket=bucket, key=latest_key)
     return df, latest_key
+
+
+
+
+
+def get_latest_json_key(bucket: str, table_name: str, base_prefix: str = 'bronze_layer/stream_job') -> str | None:
+
+    try:
+        s3_client = get_s3_client()
+        if not s3_client:
+            return None
+
+        prefix = f"{base_prefix}/{table_name}/"
+        latest_obj = None
+        latest_ts = None
+        for obj in list_objects(s3_client, bucket, prefix):
+            key = obj['Key']
+            if not key.endswith('.json'):
+                continue
+            last_modified = obj.get('LastModified')
+            if latest_ts is None or (last_modified and last_modified > latest_ts):
+                latest_ts = last_modified
+                latest_obj = key
+
+        return latest_obj
+    except Exception as e:
+        logging.error(f"Error getting latest json key for {table_name}: {e}")
+        return None

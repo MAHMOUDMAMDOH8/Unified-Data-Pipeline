@@ -10,3 +10,4 @@ dbt-core
 dbt-clickhouse
 pyspark
 kafka-python
+great_expectations

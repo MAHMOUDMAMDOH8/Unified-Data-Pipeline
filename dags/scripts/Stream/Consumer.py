@@ -1,66 +1,140 @@
-from pyspark.sql import SparkSession
-from pyspark.sql.functions import current_timestamp, date_format
-import time
 import os
+import sys
+import logging
+from utils import create_spark_session, load_config
+from pyspark.sql.types import (
+    StructType, StructField, StringType, LongType,
+    DoubleType, IntegerType, ArrayType
+)
+from pyspark.sql import functions as F
 
 
-kafka_servers = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'kafka:9092')
-s3_endpoint = os.getenv('S3_ENDPOINT_URL', 'https://legendary-waddle-wpxjw6pjxp7f9pvp-4566.app.github.dev')
-s3_bucket = os.getenv('DATA_LAKE_BUCKET', 'incircl')
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger('consumer')
 
-spark = SparkSession.builder \
-    .appName("EcommerceLogConsumer") \
-    .config("spark.jars.packages","org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.0") \
-    .config("spark.sql.adaptive.enabled", "true") \
-    .config("spark.sql.adaptive.coalescePartitions.enabled", "true") \
-    .config("spark.sql.streaming.checkpointLocation", "/tmp/checkpoint") \
-    .getOrCreate()
 
-df = spark.readStream \
-    .format("kafka") \
-    .option("kafka.bootstrap.servers", kafka_servers) \
-    .option("subscribe", "Stock") \
-    .option("startingOffsets", "latest") \
+order_schema = StructType([
+    StructField("timestamp", StringType(), True),
+    StructField("level", StringType(), True),
+    StructField("service", StringType(), True),
+    StructField("event_type", StringType(), True),
+    StructField("user_id", StringType(), True),
+    StructField("session_id", StringType(), True),
+    StructField("session_duration", LongType(), True),
+    StructField("device_type", StringType(), True),
+    StructField("geo_location", StructType([
+        StructField("country", StringType(), True),
+        StructField("city", StringType(), True)
+    ])),
+    StructField("details", StructType([
+        StructField("order_id", StringType(), True),
+        StructField("status", StringType(), True),
+        StructField("order_amount", DoubleType(), True),
+        StructField("currency", StringType(), True),
+        StructField("shipping_method", StringType(), True),
+        StructField("shipping_address", StringType(), True),
+        StructField("warehouse", StringType(), True),
+        StructField("carrier", StringType(), True),
+        StructField("tracking_number", StringType(), True),
+        StructField("completed_at", StringType(), True),
+        StructField("delivery_estimate", StringType(), True),
+        StructField("items", ArrayType(StructType([
+            StructField("product_id", LongType(), True),
+            StructField("quantity", IntegerType(), True),
+            StructField("unit_price", DoubleType(), True),
+            StructField("line_amount", DoubleType(), True),
+            StructField("category", StringType(), True)
+        ])))
+    ]))
+])
+
+
+spark = create_spark_session()
+load_config(spark.sparkContext)
+
+logger.info("Starting Kafka stream consumer...")
+
+
+import time
+logger.info("Waiting 5 seconds for Producer to start sending data...")
+time.sleep(5)
+
+stream_df = (
+    spark.readStream.format("kafka")
+    .option("kafka.bootstrap.servers", "kafka:9092")
+    .option("subscribe", "Stock")
+    .option("startingOffsets", "earliest")  
+    .option("failOnDataLoss", "false")
     .load()
+)
 
-df_with_time = df.withColumn("processing_date", date_format(current_timestamp(), "yyyy-MM-dd")) \
-                 .withColumn("processing_hour", date_format(current_timestamp(), "HH"))
+logger.info("Kafka stream created, processing data...")
+
+event_df = stream_df.selectExpr("CAST(value AS STRING) AS raw_payload", "topic", "partition", "offset")
 
 
-output_path = f"s3://{s3_bucket}/bronze_layer/stream_job/events/"
-checkpoint_path = f"s3://{s3_bucket}/bronze_layer/stream_job/events/checkpoint/"
+def debug_kafka_batch(df, batch_id):
+    count = df.count()
+    logger.info(f"Kafka debug batch {batch_id}: {count} records")
+    if count > 0:
+        logger.info("Kafka metadata:")
+        df.select("topic", "partition", "offset").show(5, truncate=False)
+        logger.info("Sample raw payload:")
+        df.select("raw_payload").show(2, truncate=False)
+    return df
 
-query = df_with_time.selectExpr("CAST(value AS STRING)", "processing_date", "processing_hour") \
-    .writeStream \
-    .format("json") \
-    .option("path", output_path) \
-    .option("checkpointLocation", checkpoint_path) \
-    .partitionBy("processing_date", "processing_hour") \
-    .outputMode("append") \
+
+kafka_debug_query = event_df.writeStream.foreachBatch(debug_kafka_batch).start()
+
+
+payload_df = event_df.select("raw_payload")
+parsed_df = payload_df.withColumn("payload", F.from_json("raw_payload", order_schema)).select("payload.*")
+
+
+def debug_batch(df, batch_id):
+    count = df.count()
+    logger.info(f"Debug batch {batch_id}: {count} records")
+    if count > 0:
+        logger.info("Sample data:")
+        df.show(2, truncate=False)
+    return df
+
+
+debug_query = parsed_df.writeStream.foreachBatch(debug_batch).start()
+
+logger.info("Data parsing completed, starting main write stream...")
+
+
+stream_query = (
+    parsed_df.writeStream
+    .format("json")
+    .outputMode("append")
+    .trigger(processingTime="1 minute")
+    .option("path", "s3a://incircl/bronze_layer/stream_job/events/")
+    .option("checkpointLocation", "s3a://incircl/bronze_layer/stream_job/events/checkpointDir")
     .start()
+)
 
 
-last_event_time = time.time()
-
+timeout_secs_str = os.getenv("STREAM_AWAIT_TIMEOUT_SECS", "180")
 try:
-    while query.isActive:
-        progress = query.lastProgress
-        if progress and "numInputRows" in progress:
-            if progress["numInputRows"] > 0:
-                last_event_time = time.time()
-                print(f"Processed {progress['numInputRows']} records")
-        
-        if time.time() - last_event_time > 10:
-            print("No new events for 10s. Stopping query...")
-            query.stop()
-            break
+    timeout_secs = int(timeout_secs_str)
+except ValueError:
+    timeout_secs = 90
 
-        time.sleep(2)
-except Exception as e:
-    print(f"Error in streaming: {e}")
-    if query.isActive:
-        query.stop()
-finally:
-    if query.isActive:
-        query.stop()
-    spark.stop()  
+logger.info(f"Waiting for streams to process data for {timeout_secs} seconds...")
+
+terminated = stream_query.awaitTermination(timeout=timeout_secs)
+if not terminated:
+    logger.info("Timeout reached, stopping streams...")
+    try:
+        stream_query.stop()
+        debug_query.stop()
+        kafka_debug_query.stop()
+    finally:
+        spark.stop()
+else:
+    logger.info("Stream processing completed successfully")
+    debug_query.stop()
+    kafka_debug_query.stop()
+    spark.stop()

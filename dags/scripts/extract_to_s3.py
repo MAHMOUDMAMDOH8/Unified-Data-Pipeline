@@ -1,5 +1,14 @@
-from scripts.Utils.db_utils import Get_data
-from scripts.Utils.s3_utils import upload_parquet
+import sys
+import os
+
+# Add the Utils directory to Python path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+utils_dir = os.path.join(current_dir, 'Utils')
+if utils_dir not in sys.path:
+    sys.path.append(utils_dir)
+
+from db_utils import Get_data
+from s3_utils import upload_parquet
 import pandas as pd
 import logging
 from datetime import datetime

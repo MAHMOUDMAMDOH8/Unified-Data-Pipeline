@@ -1,10 +1,19 @@
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.utils.dates import days_ago
-from scripts.extract_to_s3 import landing_layer_extract
-from scripts.Utils.db_utils import create_connection, close_connection
-from scripts.GP_validate import run_validation
 
+import sys
+import os
+
+# Add the scripts directory to Python path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+scripts_dir = os.path.join(current_dir, 'scripts')
+if scripts_dir not in sys.path:
+    sys.path.append(scripts_dir)
+
+from extract_to_s3 import landing_layer_extract
+from Utils.db_utils import create_connection, close_connection
+from GP_validate_for_batch_jop import run_validation
 
 import logging
 
@@ -27,7 +36,7 @@ dag = DAG(
 
 def load_credentials():
     return {
-        "host": "172.19.0.3",
+        "host": "172.19.0.2",
         "db_name": 'store_db',
         "user": 'airflow',
         "password": 'airflow'
@@ -36,15 +45,20 @@ bucket = 'incircl'
 tables = ['products','categories','customers','employees','orders','order_details']
 
 def test_connection():
-    db_credentials = load_credentials()
-    conn, engine = create_connection(**db_credentials)
-    if conn:
-        logging.info("Database connection is valid")
-        close_connection(conn, engine)
-        return True
-    else:
-        logging.error("Failed to connect to the database")
-        return False
+    try:
+        db_credentials = load_credentials()
+        conn, engine = create_connection(**db_credentials)
+        if conn:
+            logging.info("Database connection is valid")
+            close_connection(conn, engine)
+            
+        else:
+            logging.error("Failed to connect to the database")
+            sys.exit(1)
+            
+    except Exception as e:
+        logging.error(f"Error in test_connection: {str(e)}")
+        sys.exit(1)
 
 def from_db_to_s3():
     try:
