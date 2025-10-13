@@ -206,7 +206,7 @@ def read_json_from_s3(bucket: str, key: str) -> pd.DataFrame | None:
         return None
 
 
-def get_latest_table_dataframe(file_type ,bucket: str, table_name: str) -> tuple[pd.DataFrame | None, str | None]:
+def get_latest_table_dataframe(file_type ,bucket: str, table_name: str, base_prefix: str = 'bronze_layer/batch_job') -> tuple[pd.DataFrame | None, str | None]:
 
     if file_type == 'parquet':
         latest_key = get_latest_parquet_key(bucket=bucket, table_name=table_name)

@@ -152,6 +152,13 @@ CREATE TABLE us_states (
     state_region character varying(50)
 );
 
+
+CREATE TABLE processed_files (
+    id SERIAL PRIMARY KEY,
+    file_name VARCHAR(255) NOT NULL,
+    processed_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Add primary keys and constraints
 ALTER TABLE ONLY categories ADD CONSTRAINT pk_categories PRIMARY KEY (category_id);
 ALTER TABLE ONLY customer_customer_demo ADD CONSTRAINT pk_customer_customer_demo PRIMARY KEY (customer_id, customer_type_id);

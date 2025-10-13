@@ -1,6 +1,10 @@
 import os
 import sys
 import logging
+CURRENT_DIR = os.path.dirname(__file__)
+DAGS_ROOT = os.path.abspath(os.path.join(CURRENT_DIR, '..', '..'))
+if DAGS_ROOT not in sys.path:
+    sys.path.append(DAGS_ROOT)
 from utils import create_spark_session, load_config
 from pyspark.sql.types import (
     StructType, StructField, StringType, LongType,

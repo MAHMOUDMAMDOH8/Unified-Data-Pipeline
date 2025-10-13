@@ -42,3 +42,12 @@ def Get_data(conn,engine,table_name):
         logging.error(f'Error while Extracting data from {table_name} table: {str(E)}')
         return None
 
+
+def is_file_processed(conn, file_name):
+    query = text("SELECT 1 FROM processed_files WHERE file_name = :file_name")
+    result = conn.execute(query, {'file_name': file_name}).fetchone()
+    return result is not None
+
+def mark_file_as_processed(conn, file_name):
+    query = text("INSERT INTO processed_files (file_name) VALUES (:file_name)")
+    conn.execute(query, {'file_name': file_name})
