@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: ecommerce_row
+    database: UNIFIED_ECOMM
+    schema: PUBLIC
+    tables:
+      - name: RAW_CATEGORIES
+      - name: RAW_CUSTOMERS
+      - name: RAW_EMPLOYEES
+      - name: RAW_EVENTS
+      - name: RAW_EVENTS_ITEMS
+      - name: RAW_ORDERS
+      - name: RAW_ORDER_DETAILS
+      - name: RAW_PRODUCTS
+      - name: RAW_USERS
