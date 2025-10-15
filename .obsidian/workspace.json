@@ -20,8 +20,23 @@
               "icon": "lucide-file",
               "title": "Data_Warehouse_Model"
             }
+          },
+          {
+            "id": "57ea9a44b3c432f4",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Requirements & Analysis/Data_Warehouse_Model.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Data_Warehouse_Model"
+            }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -169,8 +184,19 @@
       "bases:Create new base": false
     }
   },
-  "active": "f81ce1455f30e723",
+  "active": "57ea9a44b3c432f4",
   "lastOpenFiles": [
+    "dbt_scripts/unifide_ecomm/target/catalog.json",
+    "dbt_scripts/unifide_ecomm/target/index.html",
+    "dbt_scripts/unifide_ecomm/target/run/unifide_ecomm/models/olap_model/fact/Fact_user_event.sql",
+    "dbt_scripts/unifide_ecomm/target/compiled/unifide_ecomm/models/olap_model/fact/Fact_user_event.sql",
+    "dbt_scripts/unifide_ecomm/models/olap_model/fact/Fact_user_event.sql",
+    "dbt_scripts/unifide_ecomm/target/run/unifide_ecomm/models/olap_model/fact/Fact_orders.sql",
+    "dbt_scripts/unifide_ecomm/target/run/unifide_ecomm/models/olap_model/fact",
+    "dbt_scripts/unifide_ecomm/target/compiled/unifide_ecomm/models/olap_model/fact/Fact_orders.sql",
+    "dbt_scripts/unifide_ecomm/target/compiled/unifide_ecomm/models/olap_model/fact",
+    "dbt_scripts/unifide_ecomm/models/olap_model/fact/Fact_orders.sql",
+    "dbt_scripts/unifide_ecomm/target/run/unifide_ecomm/models/olap_model/dimensions/DIM_time.sql",
     "Requirements & Analysis/Production Data Pipeline Architecture.md",
     "Requirements & Analysis/Identifying Data Sources.md",
     "Requirements & Analysis/Business_Requirements.md",
@@ -181,7 +207,6 @@
     " Data Architecture/datalakehouse.png",
     " Data Architecture/Screenshot from 2025-09-09 20-17-09.png",
     " Data Architecture/Architecture-lakehouse-high-level.drawio.png",
-    " Data Architecture",
     "Requirements & Analysis/Project Context - E2E Data Pipeline.md"
   ]
 }

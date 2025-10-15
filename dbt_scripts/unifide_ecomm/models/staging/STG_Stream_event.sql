@@ -29,7 +29,9 @@ with valid_stream_orders as (
         "CURRENCY"::VARCHAR(5) AS currency,
         "EVENT_TYPE"::VARCHAR(25) AS event_type,
         "DEVICE_TYPE"::VARCHAR(25) AS device_type,
-        "DELIVERY_ESTIMATE"::VARCHAR(50) AS delivery_estimate
+        "DELIVERY_ESTIMATE"::VARCHAR(50) AS delivery_estimate,
+        "TRACKING_NUMBER" as tracking_number,
+        "LEVEL" as level
     FROM {{ source('ecommerce_row', 'RAW_EVENTS') }}
     WHERE 
         "ORDER_ID" IS NOT NULL
