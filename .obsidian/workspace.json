@@ -186,6 +186,9 @@
   },
   "active": "57ea9a44b3c432f4",
   "lastOpenFiles": [
+    "logs/dag_id=dbt_orchestrator/run_id=scheduled__2025-10-15T16:00:00+00:00/task_id=test_connection.dbt_test_connection/attempt=1.log",
+    "logs/dag_id=dbt_orchestrator/run_id=scheduled__2025-10-15T16:00:00+00:00/task_id=test_connection.dbt_test_connection",
+    "logs/dag_id=dbt_orchestrator/run_id=scheduled__2025-10-15T16:00:00+00:00",
     " Data Architecture/Architecture-data warehouse model.drawio.png",
     "image/Architecture-data warehouse model.drawio.png",
     "image/airflow_batch_jop.png",
@@ -199,8 +202,6 @@
     "logs/dag_id=dbt_orchestrator/run_id=scheduled__2025-10-15T15:45:00+00:00/task_id=dbt_run_dimensions.dbt_run_DIM_product/attempt=1.log",
     "logs/dag_id=dbt_orchestrator/run_id=scheduled__2025-10-15T15:45:00+00:00/task_id=dbt_run_dimensions.dbt_run_DIM_product",
     "logs/dag_id=dbt_orchestrator/run_id=scheduled__2025-10-15T15:45:00+00:00/task_id=dbt_run_dimensions.dbt_run_DIM_Customers/attempt=1.log",
-    "logs/dag_id=dbt_orchestrator/run_id=scheduled__2025-10-15T15:45:00+00:00/task_id=dbt_run_dimensions.dbt_run_DIM_Customers",
-    "logs/dag_id=dbt_orchestrator/run_id=scheduled__2025-10-15T15:45:00+00:00/task_id=dbt_run_dimensions.dbt_run_DIM_time/attempt=1.log",
     "scripts/unifide_ecomm/README.md",
     "Requirements & Analysis/Production Data Pipeline Architecture.md",
     "Requirements & Analysis/Identifying Data Sources.md",
@@ -211,7 +212,6 @@
     " Data Architecture/Screenshot from 2025-09-09 20-19-02.png",
     " Data Architecture/datalakehouse.png",
     " Data Architecture/Screenshot from 2025-09-09 20-17-09.png",
-    " Data Architecture/Architecture-lakehouse-high-level.drawio.png",
     "Requirements & Analysis/Project Context - E2E Data Pipeline.md"
   ]
 }
