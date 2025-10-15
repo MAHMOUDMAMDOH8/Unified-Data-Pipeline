@@ -7,7 +7,7 @@ Key capabilities:
 - Real-time event streaming with Kafka
 - Data lake storage on MinIO (S3-compatible)
 - Transformations with Apache Spark and dbt
-- Cloud warehouse in Snowflake (replacing Redshift)
+- Cloud warehouse in Snowflake 
 - Observability and lightweight dashboards with Streamlit
 
 
