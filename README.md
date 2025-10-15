@@ -79,11 +79,12 @@ dbt lineage sample:
 
 - Orchestration: Apache Airflow
 - Streaming: Apache Kafka (with Producer/Consumer utilities)
-- Storage: MinIO (S3-compatible) – replaces S3
+- Storage: MinIO (S3-compatible) 
 - Compute: Apache Spark
 - Transformations/Modeling: dbt (Snowflake adapter)
-- Warehouse: Snowflake – replaces Redshift
+- Warehouse: Snowflake 
 - UI/Monitoring: Streamlit (and Airflow UI)
+- Power bi : Reporting 
 
 
 ## Prerequisites
@@ -207,13 +208,4 @@ Snowflake network/security: ensure your IP (or the container egress IP) is permi
   - Check `dags/scripts/Stream/Logs` for validation or error logs
 
 
-## Roadmap
 
-- Expand CI/CD for dbt tests and Airflow DAG validation
-- Add infra-as-code examples for production Snowflake/MinIO/Kafka
-- Optional: Add Power BI/BI examples sourcing from Snowflake
-
-
-## License
-
-This project is licensed under the terms of the `LICENSE` file included in the repository.
