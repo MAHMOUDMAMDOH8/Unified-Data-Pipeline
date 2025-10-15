@@ -25,8 +25,6 @@ dag = DAG(
 
 
 PRODUCER_PATH = "/opt/airflow/dags/scripts/Stream/Producer.py"
-CONSUMER_PATH = "/opt/airflow/dags/scripts/Stream/Consumer.py"
-VALIDATION_PATH = "/opt/airflow/dags/scripts/Stream/stream_validations.py"
 
 
 task_env = {
@@ -52,19 +50,4 @@ produce_logs = BashOperator(
 )
 
 
-consume_to_s3 = BashOperator(
-    task_id='consume_to_s3',
-    bash_command=f"python {CONSUMER_PATH}",
-    env=task_env,
-    dag=dag,
-)
-
-
-validate_data = BashOperator(
-    task_id='validate_data',
-    bash_command=f"python {VALIDATION_PATH}",
-    env=task_env,
-    dag=dag,
-)
-
-produce_logs >> consume_to_s3 >> validate_data
+produce_logs 
