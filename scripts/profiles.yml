@@ -3,11 +3,11 @@ unifide_ecomm:
     dev:
       account: QDZURPO-YQ18586
       database: UNIFIED_ECOMM
-      password: UnifiedPipeline1
+      password: xxxxxxx
       role: ACCOUNTADMIN
       schema: PUBLIC
       threads: 3
       type: snowflake
-      user: 'UnifiedPipeline'
+      user: 'xxxxxxxx'
       warehouse: COMPUTE_WH
   target: dev
